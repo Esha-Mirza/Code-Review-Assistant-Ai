@@ -8,7 +8,7 @@ st.set_page_config(
 )
 
 st.title("Code Review Assistant")
-st.markdown("*AI-powered code review using Phi-3*")
+st.markdown("*AI-powered code review using TinyLlama*")
 
 # Sidebar
 with st.sidebar:
@@ -17,7 +17,7 @@ with st.sidebar:
         "Programming Language",
         ["Python", "JavaScript", "Java", "C++", "C#", "Go", "Rust", "TypeScript"]
     )
-    
+
     st.header("Tips")
     st.write("""
     - Paste your code in the text area
@@ -39,16 +39,17 @@ if st.button("Review Code", type="primary"):
             try:
                 response = requests.post(
                     "http://localhost:8000/review/",
-                    data={"code": code, "language": language}
+                    data={"code": code, "language": language},
+                    timeout=200
                 )
-                
+
                 if response.status_code == 200:
                     review = response.json().get("review", "No review generated")
-                    
+
                     st.subheader("Review Results")
                     st.markdown("---")
                     st.markdown(review)
-                    
+
                     # Download button
                     st.download_button(
                         label="Download Review",
@@ -58,12 +59,16 @@ if st.button("Review Code", type="primary"):
                     )
                 else:
                     st.error(f"Error: {response.status_code}")
-                    
+
             except requests.exceptions.ConnectionError:
                 st.error("Cannot connect to backend. Make sure FastAPI is running on port 8000.")
+            except requests.exceptions.Timeout:
+                st.error("Request timed out. The model may be taking longer than expected — try a shorter snippet.")
+            except Exception as e:
+                st.error(f"Error: {str(e)}")
     else:
         st.warning("Please paste some code to review")
 
 # Footer
 st.markdown("---")
-st.caption("Code Review Assistant | Powered by Phi-3 via Ollama")
+st.caption("Code Review Assistant | Powered by TinyLlama via Ollama")
