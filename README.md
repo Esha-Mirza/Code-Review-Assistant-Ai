@@ -1,361 +1,154 @@
 # CodeLens AI
 
-### Local AI Code Review Assistant
+AI-powered code review that runs locally with Ollama.
 
-CodeLens AI is an AI-powered code review application that uses a locally hosted large language model to analyze source code, identify potential issues, and provide actionable suggestions for improving code quality.
-
-The application combines a **DeepSeek-Coder model running through Ollama**, a **FastAPI backend**, and a **Streamlit frontend** to provide a complete local code-review workflow.
-
----
-
-## Overview
-
-Code review is an essential part of software development, but manually reviewing every implementation can be time-consuming.
-
-CodeLens AI provides an automated first-pass review by analyzing submitted source code and generating structured feedback covering potential bugs, improvements, optimizations, and development best practices.
-
-The application runs the language model locally through Ollama, allowing source code to be processed on the user's own machine rather than requiring a hosted LLM API.
-
-### Review Workflow
+Paste a function, module, or complete code snippet and get structured feedback on potential bugs, code quality, optimization opportunities, and development practices — without sending your source code to a hosted LLM API.
 
 ```text
-Source Code
-     │
-     ▼
-Streamlit Interface
-     │
-     ▼
-FastAPI Backend
-     │
-     ▼
-Ollama
-     │
-     ▼
-DeepSeek-Coder
-     │
-     ▼
-AI Code Analysis
-     │
-     ▼
-Structured Review
-     │
-     ▼
-Streamlit Interface
+                 Your Source Code
+                        │
+                        ▼
+              ┌──────────────────┐
+              │   Streamlit UI   │
+              └────────┬─────────┘
+                       │
+                       ▼
+              ┌──────────────────┐
+              │   FastAPI API    │
+              └────────┬─────────┘
+                       │
+                       ▼
+              ┌──────────────────┐
+              │     Ollama       │
+              └────────┬─────────┘
+                       │
+                       ▼
+              ┌──────────────────┐
+              │      Phi-3       │
+              │   Code Analysis  │
+              └────────┬─────────┘
+                       │
+                       ▼
+              Structured Review
 ```
 
 ---
 
-## Key Features
+## Why this exists
 
-* AI-assisted source code review
-* Local LLM inference through Ollama
-* DeepSeek-Coder for code-focused analysis
-* FastAPI REST backend
-* Streamlit web interface
-* Support for multiple programming languages
-* Bug and issue identification
-* Code improvement recommendations
-* Optimization suggestions
-* Best-practice recommendations
-* No external LLM API required for inference
-* Simple local development setup
+Code review is one of the most valuable parts of software development, but it is also one of the easiest stages to delay.
+
+A developer may want a second opinion before opening a pull request, debugging an unfamiliar function, or refactoring an existing implementation. Cloud-based coding assistants can help, but they are not always suitable when source code needs to remain on the local machine.
+
+CodeLens AI provides a local first-pass reviewer.
+
+The application sends source code to a locally running language model through Ollama and returns a structured analysis that can help identify problems before human review.
+
+The goal is not to replace experienced developers or formal testing. It is to make an additional code-review pass inexpensive, accessible, and easy to run during development.
 
 ---
 
-## Architecture
+## What it reviews
 
-CodeLens AI follows a simple separation-of-concerns architecture.
+CodeLens AI organizes its analysis around four primary areas:
+
+| Category           | Purpose                                                      |
+| ------------------ | ------------------------------------------------------------ |
+| **Bugs**           | Identify potential logical and implementation errors         |
+| **Improvements**   | Suggest clearer or more maintainable approaches              |
+| **Optimizations**  | Identify opportunities to simplify or improve implementation |
+| **Best Practices** | Recommend language and software-engineering practices        |
+
+A typical review can therefore move beyond simply answering “does this code work?” and instead ask:
 
 ```text
-┌──────────────────────────────┐
-│        Streamlit UI          │
-│                              │
-│  Language Selection          │
-│  Code Input                  │
-│  Review Output               │
-└──────────────┬───────────────┘
-               │
-               │ HTTP
-               ▼
-┌──────────────────────────────┐
-│        FastAPI Backend       │
-│                              │
-│  Request Validation          │
-│  Review Endpoint             │
-│  Model Communication         │
-└──────────────┬───────────────┘
-               │
-               │ Local API
-               ▼
-┌──────────────────────────────┐
-│            Ollama            │
-│                              │
-│      Local Model Runtime     │
-└──────────────┬───────────────┘
-               │
-               ▼
-┌──────────────────────────────┐
-│       DeepSeek-Coder         │
-│                              │
-│       Code Analysis          │
-└──────────────────────────────┘
+Does it work?
+    │
+    ├── Are there bugs?
+    ├── Is the implementation maintainable?
+    ├── Can it be simplified?
+    ├── Are there performance concerns?
+    └── Does it follow reasonable development practices?
 ```
 
-### Frontend
-
-The Streamlit application provides the user-facing interface.
-
-Users can:
-
-1. Select a programming language.
-2. Enter or paste source code.
-3. Submit the code for analysis.
-4. Review the generated feedback.
-
-### Backend
-
-The FastAPI application exposes the code-review API and manages communication between the frontend and local model runtime.
-
-### Model Layer
-
-Ollama provides the local model runtime, while DeepSeek-Coder performs the actual code-oriented language-model analysis.
-
 ---
 
-## Review Categories
+## Quick start
 
-The generated review can be organized around several areas of software quality.
-
-### Bugs
-
-Potential logical errors, runtime problems, missing checks, and other implementation issues.
-
-### Improvements
-
-Suggestions for making the implementation clearer, safer, or easier to maintain.
-
-### Optimizations
-
-Potential opportunities to simplify implementation or improve efficiency.
-
-### Best Practices
-
-Recommendations related to readability, maintainability, type safety, error handling, documentation, and language-specific conventions.
-
----
-
-## Example
-
-### Input
-
-```python
-def calculate_average(numbers):
-    total = 0
-
-    for i in range(len(numbers)):
-        total += numbers[i]
-
-    return total / len(numbers)
-```
-
-### Example Review
-
-```text
-Code Review
-
-Bugs
-- Potential ZeroDivisionError when numbers is empty.
-
-Improvements
-- Use sum(numbers) instead of manually iterating through the list.
-- Consider adding type annotations.
-
-Optimizations
-- The implementation can be simplified using Python's built-in functions.
-
-Best Practices
-- Add a docstring describing the function.
-- Define an explicit return type.
-- Validate the input before calculating the average.
-```
-
-The exact output depends on the selected local model and its generated response.
-
----
-
-# Technology Stack
-
-| Technology     | Purpose                     |
-| -------------- | --------------------------- |
-| Python         | Application development     |
-| DeepSeek-Coder | Code-focused language model |
-| Ollama         | Local model runtime         |
-| FastAPI        | Backend REST API            |
-| Streamlit      | Frontend interface          |
-| Requests       | HTTP communication          |
-| Uvicorn        | ASGI server                 |
-
----
-
-# Project Structure
-
-```text
-Code-Review-Assistant-Ai/
-│
-├── agents/
-│
-├── backend/
-│   └── main.py
-│
-├── frontend/
-│   └── app.py
-│
-├── requirements.txt
-├── .gitignore
-└── README.md
-```
-
-### `backend/`
-
-Contains the FastAPI application and model interaction logic.
-
-### `frontend/`
-
-Contains the Streamlit user interface.
-
-### `agents/`
-
-Contains the project's agent-related components and supporting AI logic.
-
-### `requirements.txt`
-
-Defines the Python dependencies required to run the application.
-
----
-
-# Requirements
-
-Before running CodeLens AI, make sure the following are installed:
-
-* Python 3.8 or newer
-* Ollama
-* DeepSeek-Coder or another compatible local model
-* 8 GB+ RAM recommended
-* Approximately 4 GB+ available storage for the model
-
-Larger models may require significantly more memory and storage.
-
----
-
-# Installation
-
-## 1. Clone the Repository
+### 1. Install the project
 
 ```bash
 git clone https://github.com/Esha-Mirza/Code-Review-Assistant-Ai.git
-
 cd Code-Review-Assistant-Ai
+
+python -m venv venv
 ```
 
----
+Activate the environment.
 
-## 2. Create a Virtual Environment
-
-### Windows
+**Windows**
 
 ```bash
-python -m venv venv
-
 venv\Scripts\activate
 ```
 
-### macOS / Linux
+**macOS / Linux**
 
 ```bash
-python3 -m venv venv
-
 source venv/bin/activate
 ```
 
----
-
-## 3. Install Dependencies
+Install dependencies:
 
 ```bash
 pip install -r requirements.txt
 ```
 
----
+### 2. Start Ollama
 
-# Configure Ollama
+Install [Ollama](https://ollama.com/) and make sure the local service is running.
 
-Install Ollama and make sure the service is running.
-
-Pull the model used by the project:
+Pull the model used by the application:
 
 ```bash
-ollama pull deepseek-coder
+ollama pull phi3
 ```
 
-Verify the model:
+Verify the installation:
 
 ```bash
 ollama list
 ```
 
-Start the Ollama service if required:
+### 3. Start the backend
 
-```bash
-ollama serve
-```
-
-> If the project configuration uses a different model tag, use that model instead.
-
----
-
-# Running the Application
-
-CodeLens AI uses separate processes for the model runtime, backend, and frontend.
-
-## 1. Start Ollama
-
-```bash
-ollama serve
-```
-
----
-
-## 2. Start the FastAPI Backend
-
-Open another terminal:
+From the project root:
 
 ```bash
 uvicorn backend.main:app --reload
 ```
 
-The backend will be available at:
+The API will be available at:
 
 ```text
 http://localhost:8000
 ```
 
-FastAPI also provides interactive API documentation at:
+FastAPI's interactive documentation will be available at:
 
 ```text
 http://localhost:8000/docs
 ```
 
----
+### 4. Start the frontend
 
-## 3. Start the Streamlit Frontend
-
-Open another terminal:
+In another terminal:
 
 ```bash
 streamlit run frontend/app.py
 ```
 
-The frontend will be available at:
+Then open:
 
 ```text
 http://localhost:8501
@@ -363,41 +156,120 @@ http://localhost:8501
 
 ---
 
-# Using CodeLens AI
+## Example
 
-Once the application is running:
+Suppose you submit:
 
-1. Open the Streamlit interface.
-2. Select the programming language.
-3. Paste the source code you want to analyze.
-4. Submit the code for review.
-5. Wait for the local model to process the request.
-6. Review the generated analysis.
+```python
+def find_user(users, user_id):
+    for user in users:
+        if user["id"] == user_id:
+            return user
+```
 
-The complete request flow is:
+CodeLens AI can analyze the implementation and return feedback such as:
+
+```text
+Bugs
+- The function assumes every item in users contains an "id" key.
+- A malformed user object can raise a KeyError.
+
+Improvements
+- Consider using user.get("id") when the input structure is not guaranteed.
+- Add type annotations for better readability and tooling support.
+
+Best Practices
+- Document the expected structure of users.
+- Define the return type explicitly.
+```
+
+The generated response depends on the local model and the code supplied for review.
+
+---
+
+## How it works
+
+CodeLens AI is split into three primary layers:
+
+```text
+┌─────────────────────────────────────────┐
+│              Frontend                   │
+│                                         │
+│              Streamlit                  │
+│                                         │
+│  Code Input → Language → Review Output  │
+└────────────────────┬────────────────────┘
+                     │
+                     │ HTTP
+                     ▼
+┌─────────────────────────────────────────┐
+│               Backend                   │
+│                                         │
+│               FastAPI                   │
+│                                         │
+│       Request → Validation → Model      │
+└────────────────────┬────────────────────┘
+                     │
+                     │ Local inference
+                     ▼
+┌─────────────────────────────────────────┐
+│             Model Runtime               │
+│                                         │
+│                Ollama                   │
+│                    │                    │
+│                  Phi-3                   │
+│                    │                    │
+│              Code Analysis              │
+└─────────────────────────────────────────┘
+```
+
+### Frontend
+
+The Streamlit frontend provides the interactive interface for submitting source code and displaying the generated review.
+
+### Backend
+
+The FastAPI backend acts as the application API.
+
+It receives the submitted code, prepares the model request, communicates with Ollama, and returns the generated review.
+
+### Model runtime
+
+Ollama provides the local inference layer.
+
+The language model is responsible for interpreting the source code and generating the review.
+
+Keeping these responsibilities separate means the interface can be changed without redesigning the model layer, and the model can be replaced without rebuilding the frontend.
+
+---
+
+## Request flow
+
+A review request follows this path:
 
 ```text
 User
  │
- │ Source Code
+ │ source code
  ▼
 Streamlit
  │
- │ HTTP Request
+ │ HTTP request
  ▼
 FastAPI
  │
- │ Model Request
+ │ prompt + source code
  ▼
 Ollama
  │
  ▼
-DeepSeek-Coder
+Phi-3
  │
- │ Generated Review
+ │ generated analysis
  ▼
 FastAPI
  │
+ │ response
  ▼
 Streamlit
  │
@@ -405,242 +277,313 @@ Streamlit
 User
 ```
 
----
-
-# API
-
-## `POST /review/`
-
-Submits source code for AI-assisted review.
-
-### Request
-
-```json
-{
-  "code": "def example():\n    pass"
-}
-```
-
-### Response
-
-```json
-{
-  "review": "Generated code review..."
-}
-```
-
-The endpoint is intended to provide a simple interface between the frontend and the local code-review model.
+The application therefore separates **presentation**, **API handling**, and **model inference** rather than putting the complete workflow into a single application component.
 
 ---
 
-# Configuration
+## Project structure
 
-The model used by the application can be changed through the backend configuration.
+```text
+Code-Review-Assistant-Ai/
+│
+├── agents/
+│   └── AI review / agent components
+│
+├── backend/
+│   └── FastAPI application
+│
+├── frontend/
+│   └── Streamlit application
+│
+├── requirements.txt
+├── .gitignore
+└── README.md
+```
+
+### `agents/`
+
+Contains the AI-related components used by the review workflow.
+
+### `backend/`
+
+Contains the FastAPI application responsible for handling review requests and communicating with the local model runtime.
+
+### `frontend/`
+
+Contains the Streamlit interface used to interact with the application.
+
+---
+
+## Model configuration
+
+The application uses Ollama as the local model runtime.
+
+The model can be changed depending on the hardware available on the host machine and the models supported by the application.
 
 For example:
-
-```python
-model = "deepseek-coder"
-```
-
-Depending on the available hardware, a smaller model may provide faster inference.
-
-For example:
-
-```bash
-ollama pull deepseek-coder:1.3b
-```
-
-The appropriate model should be configured consistently between Ollama and the application.
-
----
-
-# Performance Considerations
-
-Because inference is performed locally, performance depends heavily on the available hardware and selected model.
-
-Factors that affect response time include:
-
-* Model size
-* Available RAM
-* CPU performance
-* GPU availability
-* Input code size
-* Model quantization
-
-For systems with limited resources, a smaller model can provide faster responses at the cost of potentially lower review quality.
-
----
-
-# Privacy
-
-When configured to use Ollama for local inference, the source code submitted to CodeLens AI is processed through the locally running model rather than being sent to a third-party hosted LLM API.
-
-This makes local inference useful for development environments where keeping source code within the local machine is important.
-
-Users should still review their own environment and configuration before processing sensitive or proprietary code.
-
----
-
-# Troubleshooting
-
-## Model Not Found
-
-Check the installed Ollama models:
 
 ```bash
 ollama list
 ```
 
-If the required model is missing:
+To download a model:
 
 ```bash
-ollama pull deepseek-coder
+ollama pull phi3
 ```
+
+To test the model independently:
+
+```bash
+ollama run phi3
+```
+
+If you change the configured model, make sure the model name used by the application matches the model installed in Ollama.
 
 ---
 
-## Ollama Connection Error
+## API
 
-Make sure Ollama is running:
+The backend exposes the code-review functionality through FastAPI.
 
-```bash
-ollama serve
-```
-
----
-
-## Backend Connection Error
-
-Start the FastAPI server:
-
-```bash
-uvicorn backend.main:app --reload
-```
-
-Then verify:
+Once the backend is running, open:
 
 ```text
 http://localhost:8000/docs
 ```
 
+This provides an interactive API interface for inspecting and testing the available endpoints.
+
+The API layer makes the review engine usable independently of the Streamlit interface and leaves room for future integrations such as:
+
+* IDE extensions
+* Git hooks
+* CI/CD pipelines
+* GitHub pull-request automation
+* Other web interfaces
+
 ---
 
-## Frontend Cannot Connect to Backend
+## Local inference
 
-Make sure the backend is running on the expected port:
+One of the main design choices in CodeLens AI is the use of local model inference.
+
+Instead of:
 
 ```text
-http://localhost:8000
+Application
+    │
+    ▼
+Internet
+    │
+    ▼
+Hosted LLM
+    │
+    ▼
+Response
 ```
 
-If the backend is running on another port, update the frontend configuration accordingly.
+the project uses:
+
+```text
+Application
+    │
+    ▼
+Local API
+    │
+    ▼
+Ollama
+    │
+    ▼
+Local Model
+    │
+    ▼
+Response
+```
+
+This approach can be useful when working with source code that developers prefer not to send to an external model provider.
+
+Local inference also removes the need for a per-request hosted LLM API subscription, although model performance depends on the hardware available locally.
 
 ---
 
-## Slow Model Responses
+## Supported review scenarios
 
-Try a smaller model:
+CodeLens AI can be used as a first-pass reviewer for several development workflows.
 
-```bash
-ollama pull deepseek-coder:1.3b
-```
+### Before committing
 
-Model performance will vary depending on the available hardware.
+Paste a newly written function into the reviewer to identify obvious problems before committing.
+
+### Before opening a pull request
+
+Use the reviewer as an additional automated pass before requesting human review.
+
+### Refactoring
+
+Submit an existing implementation and ask the model to identify opportunities for simplification or maintainability improvements.
+
+### Learning
+
+Use the generated feedback to understand why a particular implementation could be improved.
+
+### Debugging
+
+Provide suspicious or recently modified code and use the generated analysis as another source of hypotheses.
 
 ---
 
-# Roadmap
+## Configuration and environment
 
-Potential future improvements include:
+The application is designed to run against a locally available Ollama instance.
 
-* Repository-level code analysis
-* Git diff and pull-request review
-* Security vulnerability analysis
+The basic setup is:
+
+```text
+Python Application
+       │
+       ▼
+FastAPI
+       │
+       ▼
+Ollama
+       │
+       ▼
+Local Model
+```
+
+Make sure Ollama is available before submitting review requests.
+
+If Ollama is running on a non-default host or port, the corresponding backend configuration should be updated accordingly.
+
+---
+
+## Performance considerations
+
+Local inference performance depends primarily on the selected model and available hardware.
+
+Important factors include:
+
+* CPU performance
+* GPU availability
+* Available RAM
+* Model size
+* Input source-code length
+* Concurrent requests
+
+For larger source files, model response time can increase significantly.
+
+A practical workflow is therefore to review focused modules, functions, or diffs rather than submitting an entire large repository in one request.
+
+---
+
+## Limitations
+
+CodeLens AI is an AI-assisted review tool, not a replacement for human code review, testing, static analysis, or security tooling.
+
+Generated feedback may contain:
+
+* False positives
+* Missed issues
+* Incorrect assumptions
+* Incomplete understanding of application context
+* Recommendations that are inappropriate for a specific codebase
+
+AI-generated suggestions should therefore be treated as recommendations and validated against the actual application requirements.
+
+For production systems, CodeLens AI should complement—not replace—automated tests, linters, static analyzers, security scanners, and experienced human reviewers.
+
+---
+
+## Roadmap
+
+Potential improvements include:
+
+* Repository-level review
+* Git diff analysis
+* Pull-request review
+* Severity classification
+* Security-focused analysis
 * Code smell detection
 * Complexity analysis
-* Automated test suggestions
-* Refactoring recommendations
-* Inline code annotations
-* Review severity levels
+* Automated test recommendations
+* Refactoring suggestions
 * Review history
-* Support for additional local LLMs
+* Multiple local model support
 * GitHub integration
-* GitLab integration
-* Automated CI/CD code review
+* CI/CD integration
+* IDE integration
+* Streaming model responses
 
 ---
 
-# Limitations
+## Development
 
-AI-generated code reviews should be treated as an additional development aid rather than a replacement for human review.
-
-Model-generated feedback can contain:
-
-* Incorrect recommendations
-* False positives
-* Missed bugs
-* Incomplete context
-* Language-specific inaccuracies
-
-For production systems, AI-generated recommendations should be validated by developers and appropriate automated testing.
-
----
-
-# Contributing
-
-Contributions are welcome.
-
-To contribute, create a feature branch:
+Create a development branch:
 
 ```bash
 git checkout -b feature/your-feature
 ```
 
-Make your changes and commit them:
+Install the project dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+Run the backend:
+
+```bash
+uvicorn backend.main:app --reload
+```
+
+Run the frontend:
+
+```bash
+streamlit run frontend/app.py
+```
+
+After making changes:
 
 ```bash
 git add .
-
 git commit -m "feat: describe your change"
-```
-
-Push the branch:
-
-```bash
 git push origin feature/your-feature
 ```
 
-Then open a pull request with a description of the proposed changes.
+---
+
+## Contributing
+
+Contributions are welcome.
+
+If you find a bug, have an improvement, or want to add support for another model or integration, open an issue or submit a pull request.
+
+When submitting a pull request, include:
+
+* What changed
+* Why the change was needed
+* How it was tested
+* Any configuration changes required
 
 ---
 
-# License
+## License
 
-This project is licensed under the MIT License.
+MIT License
 
 See the `LICENSE` file for details.
 
 ---
 
-# Author
+## Author
 
 **Esha Mirza**
 
-GitHub: [Esha-Mirza](https://github.com/Esha-Mirza)
+[GitHub](https://github.com/Esha-Mirza)
 
 ---
 
-## Related Technologies
+## Built with
 
-* [Ollama](https://ollama.com/)
-* [DeepSeek](https://www.deepseek.com/)
-* [FastAPI](https://fastapi.tiangolo.com/)
-* [Streamlit](https://streamlit.io/)
-
----
-
-<p align="center">
-  <strong>CodeLens AI</strong><br>
-  Local AI-assisted code analysis for developers.
-</p>
+[Ollama](https://ollama.com/) · [FastAPI](https://fastapi.tiangolo.com/) · [Streamlit](https://streamlit.io/) · [Python](https://www.python.org/)
