@@ -22,7 +22,6 @@
     <img src="https://img.shields.io/badge/Streamlit-frontend-FF4B4B?logo=streamlit&logoColor=white" alt="Streamlit">
   </a>
   <img src="https://img.shields.io/badge/LLM-DeepSeek--Coder-blueviolet" alt="DeepSeek-Coder">
-  <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="MIT License">
 </p>
 
 ---
